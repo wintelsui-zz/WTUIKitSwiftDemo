@@ -1,6 +1,9 @@
 # WTUIKitSwiftDemo
 ---- 
-1:WTImageZoomViewSwift-拒绝放大图片带黑边
+H4 1:WTImageZoomViewSwift-拒绝放大图片带黑边
+
+	
+----  
 ![img](/README/imageZoom01.jpg)
 ![img](/README/imageZoom02.jpg)
 
