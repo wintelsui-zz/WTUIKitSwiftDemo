@@ -10,6 +10,10 @@ import UIKit
 
 extension UIImage {
     
+    /// 计算图片在尺寸内 AspectFit 尺寸
+    ///
+    /// - Parameter size: 区域尺寸
+    /// - Returns: 图片适配尺寸
     func sizeFits(size: CGSize) -> CGSize {
         
         let imageSize: CGSize = self.size
@@ -31,6 +35,9 @@ extension UIImage {
 
 extension UIImageView {
     
+    /// 图片在UIImageView内实际尺寸
+    ///
+    /// - Returns: 图片在UIImageView内实际尺寸
     func contentSize() -> CGSize {
         if self.image != nil {
             return self.image!.sizeFits(size: self.frame.size)
@@ -51,15 +58,23 @@ class WTImageZoomViewSwift: UIScrollView,
     var baseView: UIView!
     var imageView: UIImageView!
     
-    var doubleTapGestureRecognizer: UITapGestureRecognizer!
-    
+    /// 最小尺寸
     var minSize: CGSize
     
+    /// 是否处理屏幕旋转
     var rotateEnable: Bool = true
-    var rotating: Bool = false
     
+    /// 屏幕旋转
+    private var rotating: Bool = false
+    
+    
+    /// 图片点击回调
     var imageZoomViewClosureSingleTap: (() -> ())?
+    
+    /// 图片双击回调
     var imageZoomViewClosureDoubleTap: (() -> ())?
+    
+    /// 图片长按回调
     var imageZoomViewClosureLongTap: (() -> ())?
     
     override init(frame: CGRect) {
@@ -105,11 +120,18 @@ class WTImageZoomViewSwift: UIScrollView,
         }
     }
     
-    open class func photoViewMake(frame: CGRect) -> WTImageZoomViewSwift? {
+    /// 创建对象
+    ///
+    /// - Parameter frame:  frame
+    /// - Returns: WTImageZoomViewSwift
+    open class func imageZoomViewMake(frame: CGRect) -> WTImageZoomViewSwift? {
         
         return WTImageZoomViewSwift(frame: frame)
     }
     
+    /// 加载图片
+    ///
+    /// - Parameter image: 图片
     open func load(image: UIImage) {
         self.minimumZoomScale = 1.0
         self.setZoomScale(self.minimumZoomScale, animated: true)
@@ -130,8 +152,8 @@ class WTImageZoomViewSwift: UIScrollView,
 
     }
     
-    
-    private func scaleImageMin() {
+    ///  缩放图片到最小
+    open func scaleImageMin() {
         if self.zoomScale != self.minimumZoomScale {
             self.setZoomScale(self.minimumZoomScale, animated: true)
         }
@@ -139,7 +161,8 @@ class WTImageZoomViewSwift: UIScrollView,
     
     // MARK: - Init Start
     
-    open func setup() {
+    /// 初始化 UI 等
+     private func setup() {
         self.delegate = self
         self.bouncesZoom = true
         
@@ -155,6 +178,7 @@ class WTImageZoomViewSwift: UIScrollView,
         addNotification()
     }
     
+    /// 设置手势
     private func setupGestureRecognizer() {
         //双击
         let doubleTapGesture: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(recognizer:)))
@@ -172,11 +196,13 @@ class WTImageZoomViewSwift: UIScrollView,
         baseView.addGestureRecognizer(longTapGesture)
     }
     
+    /// 添加屏幕方向监听
     private func addNotification() {
         NotificationCenter.default.addObserver(self, selector: #selector(orientationChanged(sender:)), name: NSNotification.Name.UIApplicationDidChangeStatusBarOrientation, object: nil)
 
     }
     
+    /// 移除屏幕方向监听
     private func removeNotification() {
         NotificationCenter.default.removeObserver(self)
     }
@@ -196,6 +222,9 @@ class WTImageZoomViewSwift: UIScrollView,
     
     // MARK: - GestureRecognizer Start
     
+    /// 双击手势事件
+    ///
+    /// - Parameter recognizer: 双击手势
     @objc private func handleDoubleTap(recognizer: UITapGestureRecognizer) {
         
         if self.zoomScale > self.minimumZoomScale {
@@ -212,6 +241,9 @@ class WTImageZoomViewSwift: UIScrollView,
         }
     }
     
+    /// 单击手势事件
+    ///
+    /// - Parameter recognizer: 单击手势
     @objc private func handleSingleTap(recognizer: UIGestureRecognizer) {
         
         if imageZoomViewClosureSingleTap != nil {
@@ -219,6 +251,9 @@ class WTImageZoomViewSwift: UIScrollView,
         }
     }
     
+    /// 长按手势事件
+    ///
+    /// - Parameter recognizer: 长按手势
     @objc private func handleLongTap(recognizer: UILongPressGestureRecognizer) {
         if recognizer.state == .began {
             if imageZoomViewClosureLongTap != nil {
@@ -239,6 +274,7 @@ class WTImageZoomViewSwift: UIScrollView,
     
     // MARK: - Additional Start
     
+    /// 计算图片最大缩放比例
     private func mathZoomScaleMax() {
         var imageSize: CGSize!
         if imageView.image != nil {
@@ -250,10 +286,11 @@ class WTImageZoomViewSwift: UIScrollView,
         
         let imageContentSize: CGSize = self.imageView.contentSize()
         let scaleMax: CGFloat = max(imageSize.height/imageContentSize.height, imageSize.width/imageContentSize.width)
-        self.maximumZoomScale = max(3, scaleMax)
+        self.maximumZoomScale = max(4, scaleMax)
 
     }
     
+    /// 中心位置
     private func centerContent() {
         let frame: CGRect = self.baseView.frame
         var top: CGFloat = 0
